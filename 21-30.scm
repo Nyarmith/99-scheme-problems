@@ -32,4 +32,17 @@
 ;; 25 - Generate a random permutation of the elements of a list
 (define (rnd-permu l)
   (rnd-select l (length l)))
-   
+
+;; 26 - Generate the combinations of K distinct objects chosen from the N elements of a list
+(define (combination n l)
+  (if (or (null? l) (<= n 0)) '()
+  (if (= n 1) (map (lambda (e) (cons e '())) l)
+    (let ((fst (car l))
+         (combs (combination (- n 1) (cdr l))))
+    (map (lambda (e) (cons fst e)) combs)))))
+
+;; 27 - Group the elements of a set into disjoint subsets
+;(define (group3 l)
+;)
+;
+;;(define (group l p)
