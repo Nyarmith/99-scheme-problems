@@ -39,10 +39,9 @@
   (if (= n 1) (map (lambda (e) (cons e '())) l)
     (let ((fst (car l))
          (combs (combination (- n 1) (cdr l))))
-    (map (lambda (e) (cons fst e)) combs)))))
+    (append (map (lambda (e) (cons fst e)) combs) (combination n (cdr l)))))))
 
 ;; 27 - Group the elements of a set into disjoint subsets
-;(define (group3 l)
-;)
-;
+; strategy: iterate through two-combinations, treat them as partitions (so that the cdr of the list is the unchosen elements), then do the same with 3.
+
 ;;(define (group l p)
