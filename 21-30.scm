@@ -43,5 +43,33 @@
 
 ;; 27 - Group the elements of a set into disjoint subsets
 ; strategy: iterate through two-combinations, treat them as partitions (so that the cdr of the list is the unchosen elements), then do the same with 3.
+(define (cons-one-partition l la)
+  (if (null? l) '()
+  (let ((fst (car l))
+         (snd (cdr l)))
+  (cons (cons (cons fst '()) (cons (append la snd) '()))
+          (cons-one-partition snd (cons fst la))))))
 
-;;(define (group l p)
+(define (combination-partition n l lo)
+  (if (or (null? l) (<= n 0)) '()
+  (if (= n 1)
+    (let ((cop (cons-one-partition l '())))
+     (map (lambda (e) (cons (car e) (cons (append lo (car (cdr e))) '()))) cop))
+    (let ((fst (car l))
+         (combs (combination-partition (- n 1) (cdr l) lo)))
+    (append (map (lambda (e) (cons (cons fst (car e)) (cdr e))) combs) (combination-partition n (cdr l) (cons fst lo))) ))))
+
+
+(define (group-helper l p)
+  (if (or (null? p) (null? l)) '()
+  (let ((group-parts (combination-partition (car p) l '())))
+  (map (lambda (e)
+    (let ((fst (car e))
+          (snd (car (cdr e))))
+    (if (null? snd) (cons fst '()) ;(cons fst '())
+    (let ((finpart (group-helper (car (cdr e)) (cdr p))))
+     (if (null? finpart) (cons fst '())
+     (map (lambda (o) (append fst o)) finpart )))))) group-parts))))
+      
+(define (group l p)
+  (map (lambda (li) (car li)) (group-helper l p)))
