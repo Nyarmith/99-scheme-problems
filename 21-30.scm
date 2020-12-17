@@ -75,3 +75,46 @@
 
 (define (group l p)
   (group-unfold (group-helper l p) '()))
+
+;; 28 - Sorting a list of lists according to length of sublists
+; Sorting a list of lists according to length of sublists
+(define (split-list-helper l lo n)
+  (if (<= n 0) (cons  (reverse lo) (cons l '()))
+  (split-list-helper (cdr l) (cons (car l) lo) (- n 1))))
+
+(define (split-list l)
+  (let ((hlf (floor (/ (length l) 2))))
+  (split-list-helper l '() hlf)))
+
+(define (l< a b)
+  (let ((len-a (length a))
+        (len-b (length b)))
+  (if (< len-a len-b) #t
+  (if (> len-a len-b) #f
+  (if (= 0 len-a) #f
+  (if (= 0 len-b) #t
+  (let ((fst-a (car a)) (fst-b (car b)))
+  (if (< fst-a fst-b) #t
+  (if (> fst-a fst-b) #f
+  (l< (cdr a) (cdr b)))))))))))
+
+(define (merge a b out)
+  (if (null? a) (reverse (append (reverse b) out))
+  (if (null? b) (reverse (append (reverse a) out))
+  (let ((fst-a (car a))
+         (fst-b (car b)))
+  (if (l< fst-a fst-b)
+    (merge (cdr a) b (cons fst-a out))
+    (merge a (cdr b) (cons fst-b out)))))))
+
+(define (lsort l)
+  (if (= 1 (length l)) l
+  (let ((parts (split-list l)))
+  (let ((a (lsort (car parts)))
+        (b (lsort (car (cdr parts)))))
+    (merge a b '())))))
+  
+
+
+;; 29 - Sort according to time frequencies
+; strategy - frequency-encode everything into a set first, sort the set by the instance-number, the go through the set and return the list
