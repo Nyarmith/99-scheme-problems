@@ -59,17 +59,19 @@
          (combs (combination-partition (- n 1) (cdr l) lo)))
     (append (map (lambda (e) (cons (cons fst (car e)) (cdr e))) combs) (combination-partition n (cdr l) (cons fst lo))) ))))
 
-
 (define (group-helper l p)
   (if (or (null? p) (null? l)) '()
   (let ((group-parts (combination-partition (car p) l '())))
   (map (lambda (e)
     (let ((fst (car e))
           (snd (car (cdr e))))
-    (if (null? snd) (cons fst '()) ;(cons fst '())
-    (let ((finpart (group-helper (car (cdr e)) (cdr p))))
-     (if (null? finpart) (cons fst '())
-     (map (lambda (o) (append fst o)) finpart )))))) group-parts))))
-      
+    (if (null? snd) (cons (cons fst '()) '())
+    (let ((finpart (group-helper snd (cdr p))))
+     (map (lambda (o)  (cons fst (car o))) finpart ))))) group-parts))))
+
+(define (group-unfold l lo)
+  (if (null? l) lo
+   (group-unfold (cdr l) (append lo (car l) ))))
+
 (define (group l p)
-  (map (lambda (li) (car li)) (group-helper l p)))
+  (group-unfold (group-helper l p) '()))
