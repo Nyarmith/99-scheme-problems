@@ -41,7 +41,7 @@
          (combs (combination (- n 1) (cdr l))))
     (append (map (lambda (e) (cons fst e)) combs) (combination n (cdr l)))))))
 
-;; 27 - Group the elements of a set into disjoint subsets
+;; 28 - Group the elements of a set into disjoint subsets
 ; strategy: iterate through two-combinations, treat them as partitions (so that the cdr of the list is the unchosen elements), then do the same with 3.
 (define (cons-one-partition l la)
   (if (null? l) '()
@@ -76,7 +76,10 @@
 (define (group l p)
   (group-unfold (group-helper l p) '()))
 
-;; 28 - Sorting a list of lists according to length of sublists
+;; 27 - Group the elements of a set into disjoint subsets
+(define (group3 l) (cons-one-partition l '(2 3 4)))
+
+;; 29 - Sorting a list of lists according to length of sublists
 ; Sorting a list of lists according to length of sublists
 (define (split-list-helper l lo n)
   (if (<= n 0) (cons  (reverse lo) (cons l '()))
@@ -115,6 +118,45 @@
     (merge a b '())))))
   
 
-
-;; 29 - Sort according to time frequencies
+;; 30 - Sort according to time frequencies
 ; strategy - frequency-encode everything into a set first, sort the set by the instance-number, the go through the set and return the list
+
+(define (item-in-histlist a l li)
+  (if (null? l) (cons (cons 1 (cons a '())) li)
+  (let ((sublist (car (cdr (car l))))
+        (listcount (car (car l))))
+  (if (eq? a sublist) (append (cons (cons (+ listcount 1) (cons a '())) li) (cdr l))
+    (item-in-histlist a (cdr l) (cons (car l) li))))))
+
+(define (hist-process l lo)
+  (if (null? l) lo
+  (let ((newlist (item-in-histlist (car l) lo '())))
+    (hist-process (cdr l)  newlist))))
+
+(define (lh< a b)
+  (let ((len-a (car a))
+        (len-b (car b)))
+  (if (< len-a len-b) #t #f)))
+
+(define (merge-hist a b out)
+  (if (null? a) (reverse (append (reverse b) out))
+  (if (null? b) (reverse (append (reverse a) out))
+  (let ((fst-a (car a))
+         (fst-b (car b)))
+  (if (lh< fst-a fst-b)
+    (merge-hist (cdr a) b (cons fst-a out))
+    (merge-hist a (cdr b) (cons fst-b out)))))))
+
+(define (hist-sort l)
+  (if (= 1 (length l)) l
+  (let ((parts (split-list l)))
+  (let ((a (hist-sort (car parts)))
+        (b (hist-sort (car (cdr parts)))))
+    (merge a b '())))))
+
+(define (denest-hist l)
+  (if (null? l) '()
+   (cons (car (cdr (car l))) (denest-hist (cdr l) ))))
+
+(define (l-hist-sort l)
+  (denest-hist (hist-sort (hist-process l '()))))
