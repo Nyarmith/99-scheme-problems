@@ -22,11 +22,6 @@
   (if (= a b) (cons b '())
    (cons a (range (+ a 1) b))))
 
-(define (cdr-n l n c)
-  (if (null? l) '()
-  (if (= n c) l
-   (cdr-n (cdr l) n (+ c 1)))))
-
 (define (eliminate-every l n c)
   (if (null? l) '()
   (if (= n c) (eliminate-every (cdr l) n 1)
@@ -40,7 +35,17 @@
 (define (gen-primes n)
   (sieve (range 2 n)))
 
-(define (totient-phi x) (length (gen-primes (- x 1))))
+; incorrect defn:
+;(define (totient-phi x) (length (gen-primes (- x 1))))
+; actual correct defn
+(define (num-coprime x l)
+  (if (null? l) 0
+  (let ((cpn (num-coprime x (cdr l))))
+  (if (coprime (car l) x)
+   (+ 1 cpn)
+   cpn
+   ))))
+(define (totient-phi x) (+ 1 (num-coprime x (range 2 (- x 1)))))
 
 ;; 35 - Determine the prime factors of a given positive integer
 (define (test-factors x l)
@@ -54,3 +59,42 @@
   (test-factors x (gen-primes x)))
 
 ;; 36 - Determine the prime factors of a given positive integer (2)
+; this time the output should be like ((3 2) (5 1) (7 1))
+(define (rh-inc l n)
+  (if (null? l) (cons (cons n (cons 1 '())) '())
+  (let ((e (car (car l)))
+         (m (car (cdr (car l)))))
+  (if (= n e) (cons (cons n (cons (+ m 1) '())) (cdr l))
+    (cons (car l) (rh-inc (cdr l) n))))))
+
+(define (rh-compress l lo)
+  (if (null? l) lo
+    (rh-compress (cdr l) (rh-inc lo (car l)))))
+
+(define (prime-factors-mult x)
+  (rh-compress (prime-factors x) '()))
+
+;; 37 - Calculate Euler's Totient Function phi(m) more efficiently
+; oh, I see I misunderstood what the totient function is in problem 34
+
+
+;; 38 - Compare the two methods of calc
+
+;; 39 - A ranged list of prime numbers
+(define (primes-in-range-helper b l)
+ (if (null? l) l
+ (if (< b (car l)) (primes-in-range-helper b (cdr l)) l)))
+
+
+(define (primes-in-range a b) (primes-in-range-helper a (gen-primes b)))
+
+;; 40 - Goldbach's conjecture
+
+;somehow do a double loop here
+(define (goldback-helper l n)
+)
+
+(define (goldbach x)
+  (let ((x-primes (prime-factors x)))
+  (goldbach-helper x-primes x)))
+   
